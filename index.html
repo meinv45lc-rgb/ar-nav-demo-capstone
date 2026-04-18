@@ -830,11 +830,14 @@
 
     // Reassurance messages
     const reassuranceMessages = [
-      () => 'You are on the right path',
-      () => `~${Math.max(1, routes[state.exit].length - state.stepIndex - 1)} min to Exit ${state.exit}`,
-      () => 'Accessible route available',
-      () => 'Stay on the highlighted path',
-    ];
+  () => 'You are on the right path',
+  () => {
+    if (!state.exit) return '';
+    return `~${Math.max(1, routes[state.exit].length - state.stepIndex - 1)} min to Exit ${state.exit}`;
+  },
+  () => 'Accessible route available',
+  () => 'Stay on the highlighted path',
+];
 
     /* ─────────────────────────────────────────────
        Mini Map Data
