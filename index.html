@@ -520,6 +520,10 @@
 
     /* ── Nav: Distance badge (glass pill on camera) ── */
     .distance-badge {
+      position: absolute;
+      bottom: 483px;
+      left: 50%;
+      transform: translateX(-50%);
       padding: 7px 18px;
       border-radius: var(--radius-pill);
       background: var(--overlay-glass);
@@ -531,6 +535,8 @@
       font-weight: 600;
       letter-spacing: 0.02em;
       transition: opacity 300ms ease-out;
+      white-space: nowrap;
+      pointer-events: none;
     }
 
     /* ── Nav: Arrow wrapper ── */
@@ -573,6 +579,10 @@
 
     /* ── Nav: Reassurance pill — green-tinted to signal confirmed / on-track ── */
     .reassurance-pill {
+      position: absolute;
+      bottom: 523px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       align-items: center;
       gap: var(--space-2);
@@ -585,6 +595,8 @@
       color: var(--text-on-dark);
       font-size: var(--font-size-body-small);
       transition: opacity 300ms ease-out;
+      white-space: nowrap;
+      pointer-events: none;
     }
 
     .reassurance-pill .material-symbols-outlined {
@@ -628,7 +640,7 @@
     /* ── Nav: Mini map (white card on camera) ── */
     .minimap-wrap {
       position: absolute;
-      bottom: 168px;
+      bottom: calc(204px + env(safe-area-inset-bottom, 0px));
       left: var(--space-4);
       width: 160px;
       height: 130px;
