@@ -6,68 +6,150 @@
   <title>AR Station Navigator</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <style>
-    /* ─────────────────────────────────────────────
-       Design Tokens (from theme v2.css + AR extensions)
-    ───────────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════
+       DESIGN TOKENS — two-layer system (primitive → semantic)
+       All raw values live in the Primitive layer.
+       All component rules reference the Semantic layer only.
+    ═══════════════════════════════════════════════════════ */
     :root {
-      /* Color — from theme v2 */
-      --color-primary: #2f49d1;
-      --color-primary-pressed: #263cb0;
-      --color-primary-disabled: #8ea0ee;
-      --color-secondary: #66aeb5;
-      --color-accent: #1eb6e8;
-      --color-success: #55b949;
-      --color-warning: #f2b93b;
-      --color-error: #d9534f;
 
-      /* Typography */
-      --font-family-base: "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      /* ── Primitive palette ─────────────────────────────── */
+
+      /* Blue */
+      --blue-200: #7eb3ff;   /* light blue, on-dark accent */
+      --blue-300: #8ea0ee;   /* disabled / washed */
+      --blue-600: #2f49d1;   /* primary action */
+      --blue-700: #263cb0;   /* pressed */
+
+      /* Navy (arrows, deep overlays) */
+      --navy-800: #1a2f6b;
+
+      /* Green */
+      --green-400: #4ade80;  /* live / ambient positive */
+      --green-500: #55b949;  /* success text/icon */
+      --green-600: #4CAF50;  /* success fill / arrived */
+
+      /* Red */
+      --red-400:  #ff5252;   /* map exit marker */
+      --red-500:  #d9534f;   /* error */
+
+      /* Amber */
+      --amber-400: #f2b93b;  /* warning */
+
+      /* Neutrals */
+      --white:    #ffffff;
+      --gray-100: #f3f3f3;   /* page background */
+      --gray-200: #e6e6e6;   /* muted surface / track */
+      --gray-300: #d9d9d9;   /* default border */
+      --gray-400: #cfcfcf;   /* placeholder text */
+      --gray-500: #a8a8a8;   /* tab inactive */
+      --gray-600: #666666;   /* secondary text */
+      --gray-700: #e1e1e1;   /* divider */
+      --gray-900: #2a2a2a;   /* primary text */
+
+      /* Ink (start-screen backdrop) */
+      --ink-900: #1a1a2e;
+      --ink-800: #16213e;
+      --ink-700: #0f3460;
+
+      /* ── Semantic: Action ──────────────────────────────── */
+      --color-primary:          var(--blue-600);
+      --color-primary-pressed:  var(--blue-700);
+      --color-primary-disabled: var(--blue-300);
+      --color-primary-on-dark:  var(--blue-200);  /* primary-tint for dark surfaces */
+
+      /* ── Semantic: State ───────────────────────────────── */
+      --color-success:  var(--green-500);
+      --color-arrived:  var(--green-600);   /* kept for JS string reference */
+      --color-warning:  var(--amber-400);
+      --color-error:    var(--red-500);
+      --color-live:     var(--green-400);   /* pulsing live indicator */
+
+      /* ── Semantic: Green overlay (status / ambient / confirmed) ── */
+      --overlay-green:       rgba(74, 222, 128, 0.13);  /* soft green-tinted surface */
+      --border-green:        rgba(74, 222, 128, 0.32);  /* green border for live pills */
+
+      /* ── Semantic: Surface (light UI) ─────────────────── */
+      --surface-page:   var(--gray-100);    /* app/page background */
+      --surface-card:   var(--white);       /* cards, panels */
+      --surface-muted:  var(--gray-200);    /* progress track, muted fills */
+
+      /* ── Semantic: Surface (start-screen ink backdrop) ── */
+      --surface-ink-1:  var(--ink-900);
+      --surface-ink-2:  var(--ink-800);
+      --surface-ink-3:  var(--ink-700);
+
+      /* ── Semantic: Overlay (camera layer) ─────────────── */
+      --overlay-dark:        rgba(0, 0, 0, 0.42);   /* pill/button bg on camera */
+      --overlay-dark-deep:   rgba(0, 0, 0, 0.60);   /* pressed dark overlay */
+      --overlay-glass:       rgba(255, 255, 255, 0.12);  /* glass surface */
+      --overlay-glass-dim:   rgba(255, 255, 255, 0.15);  /* slightly more opaque glass */
+      --overlay-glass-light: rgba(255, 255, 255, 0.92);  /* nearly-opaque white card on camera */
+      --overlay-glass-input: rgba(255, 255, 255, 0.08);  /* glass input field */
+
+      /* ── Semantic: Border ──────────────────────────────── */
+      --border-default:      var(--gray-300);        /* default card/input border */
+      --border-divider:      var(--gray-700);        /* list dividers */
+      --border-on-dark:      rgba(255, 255, 255, 0.20);  /* border on camera/dark */
+      --border-on-dark-strong: rgba(255, 255, 255, 0.45); /* stronger, for back button */
+      --border-on-light:     rgba(0, 0, 0, 0.08);   /* border of white card on camera */
+
+      /* ── Semantic: Text (light surfaces) ──────────────── */
+      --text-primary:     var(--gray-900);
+      --text-secondary:   var(--gray-600);
+      --text-placeholder: var(--gray-400);
+      --text-inactive:    var(--gray-500);
+
+      /* ── Semantic: Text (dark / camera surfaces) ──────── */
+      --text-on-dark:       var(--white);
+      --text-on-dark-muted: rgba(255, 255, 255, 0.55);
+      --text-on-dark-faint: rgba(255, 255, 255, 0.35);
+
+      /* ── Semantic: Arrow ───────────────────────────────── */
+      --arrow-fill: var(--navy-800);
+      --arrow-size: 160px;
+
+      /* ── Semantic: Blur ────────────────────────────────── */
+      --blur-sm: blur(6px);
+      --blur-md: blur(10px);
+      --blur-lg: blur(16px);
+
+      /* ── Typography ────────────────────────────────────── */
+      --font-family-base:    "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
       --font-family-heading: "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-      --font-size-overline: 11px;
-      --font-size-caption: 12px;
+      --font-size-overline:  11px;
+      --font-size-caption:   12px;
       --font-size-body-small: 13px;
-      --font-size-body: 15px;
-      --font-size-h3: 24px;
-      --font-size-h2: 28px;
-      --font-size-h1: 32px;
+      --font-size-body:      15px;
+      --font-size-h3:        24px;
+      --font-size-h2:        28px;
+      --font-size-h1:        32px;
       --font-weight-regular: 400;
-      --font-weight-medium: 500;
+      --font-weight-medium:  500;
 
-      /* Spacing */
-      --space-1: 4px;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --space-6: 24px;
-      --space-8: 32px;
+      /* ── Spacing ───────────────────────────────────────── */
+      --space-1:  4px;
+      --space-2:  8px;
+      --space-3:  12px;
+      --space-4:  16px;
+      --space-6:  24px;
+      --space-8:  32px;
       --space-10: 40px;
 
-      /* Radius */
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
+      /* ── Radius ────────────────────────────────────────── */
+      --radius-sm:   4px;
+      --radius-md:   8px;
+      --radius-lg:   12px;
+      --radius-xl:   20px;
       --radius-pill: 999px;
 
-      /* Motion */
-      --motion-duration-micro: 120ms;
+      /* ── Motion ────────────────────────────────────────── */
+      --motion-duration-micro:  120ms;
       --motion-duration-normal: 220ms;
-      --motion-duration-macro: 320ms;
+      --motion-duration-macro:  320ms;
       --motion-easing-standard: ease-out;
 
-      /* AR Demo Extensions */
-      --color-arrived: #4CAF50;
-      --color-cam-bg-1: #1a1a2e;
-      --color-cam-bg-2: #16213e;
-      --color-cam-bg-3: #0f3460;
-      --color-map-bg: #0d1b2a;
-      --color-map-corridor: rgba(255,255,255,0.18);
-      --color-map-route: #00e5ff;
-      --color-map-dot: #2f49d1;
-      --color-map-exit: #ff5252;
-      --glass-bg: rgba(255, 255, 255, 0.12);
-      --glass-border: 1px solid rgba(255, 255, 255, 0.18);
-      --glass-blur: blur(16px);
-      --arrow-size: 120px;
+      /* ── App ───────────────────────────────────────────── */
       --app-max-width: 430px;
     }
 
@@ -85,7 +167,7 @@
       height: 100%;
       overflow: hidden;
       font-family: var(--font-family-base);
-      background: #000;
+      background: var(--surface-ink-1);
       -webkit-font-smoothing: antialiased;
     }
 
@@ -121,14 +203,16 @@
       overflow: hidden;
     }
 
-    /* ─────────────────────────────────────────────
+    /* ═══════════════════════════════════════════
        SCREEN 1 — Start
-    ───────────────────────────────────────────── */
+       Dark ink backdrop + white card setup form.
+       Both screens share the white-card pattern.
+    ═══════════════════════════════════════════ */
     #screen-start {
       background: linear-gradient(160deg,
-        var(--color-cam-bg-1) 0%,
-        var(--color-cam-bg-2) 55%,
-        var(--color-cam-bg-3) 100%);
+        var(--surface-ink-1) 0%,
+        var(--surface-ink-2) 55%,
+        var(--surface-ink-3) 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -137,10 +221,10 @@
       gap: var(--space-8);
     }
 
-    /* Header */
+    /* ── Start: Header (on dark backdrop) ── */
     .start-header {
       text-align: center;
-      color: #fff;
+      color: var(--text-on-dark);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -149,7 +233,7 @@
 
     .start-header__icon {
       font-size: 52px;
-      color: #7eb3ff;
+      color: var(--color-primary-on-dark);
       margin-bottom: var(--space-2);
     }
 
@@ -162,36 +246,34 @@
 
     .start-header__sub {
       font-size: var(--font-size-body-small);
-      color: rgba(255, 255, 255, 0.55);
+      color: var(--text-on-dark-muted);
     }
 
-    /* Card */
+    /* ── Start: Card (white — matches nav bottom panel) ── */
     .start-card {
       width: 100%;
-      background: var(--glass-bg);
-      border: var(--glass-border);
-      border-radius: 20px;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
+      background: var(--surface-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
       padding: var(--space-6);
       display: flex;
       flex-direction: column;
       gap: var(--space-6);
     }
 
-    /* Field group */
+    /* ── Start: Field group ── */
     .field-group { display: flex; flex-direction: column; }
 
     .field-label {
       font-size: var(--font-size-caption);
       font-weight: var(--font-weight-medium);
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.08em;
       margin-bottom: var(--space-2);
     }
 
-    /* Select */
+    /* ── Start: Select ── */
     .select-wrap { position: relative; }
 
     .field-select {
@@ -199,9 +281,9 @@
       padding: 12px var(--space-4);
       padding-right: 36px;
       border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
+      border: 1px solid var(--border-default);
+      background: var(--surface-page);
+      color: var(--text-primary);
       font-size: var(--font-size-body);
       font-family: var(--font-family-base);
       appearance: none;
@@ -209,11 +291,15 @@
       cursor: pointer;
     }
 
-    .field-select option { background: #1a1a2e; color: #fff; }
+    .field-select option {
+      background: var(--surface-card);
+      color: var(--text-primary);
+    }
 
     .field-select:focus {
       outline: none;
-      box-shadow: 0 0 0 2px rgba(47, 73, 209, 0.6);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(47, 73, 209, 0.18);
     }
 
     .select-caret {
@@ -221,12 +307,12 @@
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
-      color: rgba(255, 255, 255, 0.55);
+      color: var(--text-secondary);
       pointer-events: none;
       font-size: 20px;
     }
 
-    /* Exit pills */
+    /* ── Start: Exit pills ── */
     .exit-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -236,9 +322,9 @@
     .exit-pill {
       padding: 13px var(--space-4);
       border-radius: var(--radius-pill);
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      background: rgba(255, 255, 255, 0.07);
-      color: rgba(255, 255, 255, 0.8);
+      border: 1.5px solid var(--border-default);
+      background: var(--surface-page);
+      color: var(--text-primary);
       font-size: var(--font-size-body);
       font-weight: var(--font-weight-medium);
       cursor: pointer;
@@ -252,22 +338,22 @@
     .exit-pill.selected {
       background: var(--color-primary);
       border-color: var(--color-primary);
-      color: #fff;
-      box-shadow: 0 4px 18px rgba(47, 73, 209, 0.45);
+      color: var(--text-on-dark);
+      box-shadow: 0 4px 18px rgba(47, 73, 209, 0.30);
     }
 
     .exit-pill:active { opacity: 0.72; }
 
-    /* Exit description */
+    /* ── Start: Exit description ── */
     .exit-desc {
       font-size: var(--font-size-body-small);
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--text-secondary);
       text-align: center;
       min-height: 18px;
       transition: opacity var(--motion-duration-normal) ease;
     }
 
-    /* Primary CTA */
+    /* ── Shared: Primary CTA button ── */
     .btn-primary {
       display: flex;
       align-items: center;
@@ -278,7 +364,7 @@
       border-radius: var(--radius-pill);
       border: none;
       background: var(--color-primary);
-      color: #fff;
+      color: var(--text-on-dark);
       font-size: var(--font-size-body);
       font-weight: var(--font-weight-medium);
       cursor: pointer;
@@ -295,13 +381,13 @@
 
     .btn-primary:not(:disabled):active { background: var(--color-primary-pressed); }
 
-    /* ─────────────────────────────────────────────
+    /* ═══════════════════════════════════════════
        SCREEN 2 — Navigation
-    ───────────────────────────────────────────── */
-    #screen-nav { background: #000; }
-
-    /* Plain dark background when camera unavailable */
-    #screen-nav { background: #111; }
+       Camera layer + overlay UI on top.
+       Overlay uses dark pills on camera;
+       bottom card uses the same white-card token as start screen.
+    ═══════════════════════════════════════════ */
+    #screen-nav { background: var(--surface-ink-1); }
 
     /* AR Overlay */
     .ar-overlay {
@@ -314,16 +400,40 @@
 
     .ar-overlay > * { pointer-events: auto; }
 
-    /* Top bar */
+    /* ── Nav: Top bar ── */
     .nav-top {
       display: flex;
-      align-items: center;
-      gap: var(--space-3);
+      flex-direction: column;
+      gap: var(--space-2);
       padding: var(--space-3) var(--space-4);
       padding-top: max(var(--space-3), env(safe-area-inset-top));
-      background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
+      /* Scrim fades dark for readability over any camera content */
+      background: linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, transparent 100%);
     }
 
+    /* Row 1: back button | centered destination pill | balancing spacer */
+    .nav-top-row1 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    /* Row 2: live status pill, right-aligned */
+    .nav-top-row2 {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Invisible spacer mirrors the back button to keep the pill centered */
+    .nav-top-spacer {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      pointer-events: none;
+    }
+
+    /* ── Nav: Back button (bordered square) ── */
     .nav-btn-back {
       flex-shrink: 0;
       display: flex;
@@ -331,39 +441,72 @@
       justify-content: center;
       width: 42px;
       height: 42px;
-      border-radius: var(--radius-pill);
-      border: 1.5px solid rgba(255, 255, 255, 0.45);
-      background: rgba(0, 0, 0, 0.35);
-      color: #fff;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-on-dark-strong);
+      background: var(--overlay-dark);
+      color: var(--text-on-dark);
       cursor: pointer;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
       transition: background var(--motion-duration-micro) ease;
     }
 
-    .nav-btn-back:active { background: rgba(0,0,0,0.6); }
+    .nav-btn-back:active { background: var(--overlay-dark-deep); }
 
+    /* ── Nav: Destination pill ── */
     .nav-dest-pill {
-      flex: 1;
+      flex: 0 1 auto;
+      max-width: calc(100% - 42px - 42px - 2 * var(--space-3));
       display: flex;
       align-items: center;
       gap: var(--space-2);
       padding: 9px var(--space-4);
       border-radius: var(--radius-pill);
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
+      background: var(--overlay-dark);
+      backdrop-filter: var(--blur-md);
+      -webkit-backdrop-filter: var(--blur-md);
+      border: 1px solid var(--border-on-dark);
+      color: var(--text-on-dark);
+      font-size: var(--font-size-body-small);
+      font-weight: var(--font-weight-medium);
       overflow: hidden;
     }
 
-    .nav-dest-pill .material-symbols-outlined { font-size: 18px; color: #7eb3ff; flex-shrink: 0; }
+    .nav-dest-pill .material-symbols-outlined {
+      font-size: 18px;
+      color: var(--color-primary-on-dark);
+      flex-shrink: 0;
+    }
     .nav-dest-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Central AR area */
+    /* ── Nav: AR Live status pill — green-tinted to signal active state ── */
+    .nav-status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--overlay-green);
+      border: 1px solid var(--border-green);
+      backdrop-filter: var(--blur-md);
+      -webkit-backdrop-filter: var(--blur-md);
+      color: var(--color-live);
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0.04em;
+    }
+
+    .nav-live-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--color-live);
+      flex-shrink: 0;
+      animation: livePulse 1.6s ease-in-out infinite;
+    }
+
+    /* ── Nav: Central AR area ── */
     .ar-center {
       flex: 1;
       display: flex;
@@ -375,22 +518,22 @@
       pointer-events: none;
     }
 
-    /* Distance badge */
+    /* ── Nav: Distance badge (glass pill on camera) ── */
     .distance-badge {
       padding: 7px 18px;
       border-radius: var(--radius-pill);
-      background: var(--glass-bg);
-      border: var(--glass-border);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      color: #fff;
+      background: var(--overlay-glass);
+      border: 1px solid var(--border-on-dark);
+      backdrop-filter: var(--blur-lg);
+      -webkit-backdrop-filter: var(--blur-lg);
+      color: var(--text-on-dark);
       font-size: var(--font-size-body-small);
       font-weight: 600;
       letter-spacing: 0.02em;
       transition: opacity 300ms ease-out;
     }
 
-    /* Arrow wrapper — CSS transition for direction changes */
+    /* ── Nav: Arrow wrapper ── */
     .arrow-wrap {
       display: flex;
       align-items: center;
@@ -402,87 +545,117 @@
 
     .arrow-wrap.fading { opacity: 0; }
 
-    /* SVG arrow */
+    /* ── Nav: SVG arrow — fill driven by CSS token ── */
     .nav-arrow {
       width: 100%;
       height: 100%;
-      filter: drop-shadow(0 4px 24px rgba(0,0,0,0.7));
+      filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.50));
     }
 
-    /* Arrived — checkmark circle state */
+    .nav-arrow path { fill: var(--arrow-fill); }
+
+    /* ── Nav: Arrived checkmark ── */
     .arrived-icon {
       font-size: 96px;
       color: var(--color-arrived);
-      filter: drop-shadow(0 0 24px rgba(76, 175, 80, 0.6));
+      filter: drop-shadow(0 0 24px rgba(76, 175, 80, 0.55));
       animation: arrivedPop 400ms var(--motion-easing-standard);
     }
 
-    /* Step indicator */
+    /* ── Nav: Step indicator ── */
     .step-indicator {
       font-size: var(--font-size-caption);
-      color: rgba(255, 255, 255, 0.6);
+      color: var(--text-on-dark-muted);
       font-weight: var(--font-weight-medium);
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
-    /* Reassurance pill */
+    /* ── Nav: Reassurance pill — green-tinted to signal confirmed / on-track ── */
     .reassurance-pill {
       display: flex;
       align-items: center;
       gap: var(--space-2);
       padding: 8px 16px;
       border-radius: var(--radius-pill);
-      background: var(--glass-bg);
-      border: var(--glass-border);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      color: rgba(255, 255, 255, 0.85);
+      background: var(--overlay-green);
+      border: 1px solid var(--border-green);
+      backdrop-filter: var(--blur-lg);
+      -webkit-backdrop-filter: var(--blur-lg);
+      color: var(--text-on-dark);
       font-size: var(--font-size-body-small);
       transition: opacity 300ms ease-out;
     }
 
     .reassurance-pill .material-symbols-outlined {
       font-size: 16px;
-      color: #4ade80;
+      color: var(--color-live);
       flex-shrink: 0;
     }
 
     .reassurance-pill.fading { opacity: 0; }
 
-    /* Mini map */
+    /* ── Nav: Right-side utility buttons (visual placeholders) ── */
+    .nav-utils {
+      position: absolute;
+      right: var(--space-4);
+      top: 55%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    .nav-util-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-on-dark);
+      background: var(--overlay-glass-dim);
+      backdrop-filter: var(--blur-md);
+      -webkit-backdrop-filter: var(--blur-md);
+      color: var(--text-on-dark);
+      cursor: default;
+    }
+
+    .nav-util-btn .material-symbols-outlined { font-size: 22px; }
+
+    /* ── Nav: Mini map (white card on camera) ── */
     .minimap-wrap {
       position: absolute;
-      bottom: 160px;
+      bottom: 168px;
       left: var(--space-4);
       width: 160px;
       height: 130px;
       border-radius: var(--radius-md);
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      background: var(--overlay-glass-light);
+      border: 1px solid var(--border-on-light);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
       pointer-events: none;
     }
 
     .minimap-svg {
       width: 100%;
       height: 100%;
-      background: var(--color-map-bg);
+      background: transparent;
       display: block;
     }
 
-    /* Bottom glassmorphic panel */
+    /* ── Nav: Bottom instruction card (white — matches start card) ── */
     .bottom-panel {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      background: var(--glass-bg);
-      border: var(--glass-border);
-      border-bottom: none;
-      border-radius: 20px 20px 0 0;
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
+      background: var(--surface-card);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.12);
       padding: var(--space-4) var(--space-6);
       padding-bottom: max(var(--space-6), env(safe-area-inset-bottom));
       display: flex;
@@ -490,11 +663,11 @@
       gap: var(--space-3);
     }
 
-    /* Progress bar */
+    /* ── Nav: Progress bar ── */
     .progress-track {
       width: 100%;
       height: 4px;
-      background: rgba(255, 255, 255, 0.18);
+      background: var(--surface-muted);
       border-radius: var(--radius-pill);
       overflow: hidden;
     }
@@ -507,24 +680,35 @@
       width: 25%;
     }
 
-    /* Instruction */
+    /* ── Nav: Instruction row ── */
+    .instruction-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-height: 48px;
+    }
+
+    .instruction-icon {
+      font-size: 28px;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
     .instruction-text {
       font-size: 18px;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-primary);
       line-height: 1.35;
-      min-height: 48px;
-      display: flex;
-      align-items: center;
+      display: block;
     }
 
     .instruction-hint {
       font-size: var(--font-size-body-small);
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--text-secondary);
       margin-top: 2px;
     }
 
-    /* Next Step button */
+    /* ── Nav: Next Step button ── */
     .btn-next {
       display: flex;
       align-items: center;
@@ -535,7 +719,7 @@
       border-radius: var(--radius-pill);
       border: none;
       background: var(--color-primary);
-      color: #fff;
+      color: var(--text-on-dark);
       font-size: var(--font-size-body);
       font-weight: var(--font-weight-medium);
       cursor: pointer;
@@ -550,6 +734,27 @@
       cursor: default;
       transform: none;
     }
+
+    /* ── Nav: Camera error banner ── */
+    .cam-error {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(217, 83, 79, 0.85);
+      color: var(--text-on-dark);
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .cam-error .material-symbols-outlined { font-size: 15px; }
 
     /* ─────────────────────────────────────────────
        Animations
@@ -576,16 +781,10 @@
       50%      { transform: translateY(-6px); }
     }
 
-    /* Entry animations when nav screen appears */
-    .nav-entry .bottom-panel { animation: slideUp 320ms ease-out; }
-    .nav-entry .ar-center    { animation: slideUp 260ms ease-out; }
-    .nav-entry .minimap-wrap { animation: slideUp 300ms ease-out; }
-
-    /* Arrow bob when direction is straight */
-    .arrow-straight { animation: arrowBob 2s ease-in-out infinite; }
-
-    /* SVG pulse element */
-    .map-pulse { animation: mapPulse 1.8s ease-out infinite; }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
 
     /* Real camera video */
     #cam-video {
@@ -598,26 +797,16 @@
       transition: opacity 400ms ease;
     }
 
-    /* Camera denied banner */
-    .cam-error {
-      position: absolute;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: 8px 14px;
-      border-radius: var(--radius-pill);
-      background: rgba(217,83,79,0.85);
-      color: #fff;
-      font-size: var(--font-size-caption);
-      font-weight: var(--font-weight-medium);
-      white-space: nowrap;
-      pointer-events: none;
-      z-index: 20;
-    }
-    .cam-error .material-symbols-outlined { font-size: 15px; }
+    /* Entry animations when nav screen appears */
+    .nav-entry .bottom-panel { animation: slideUp 320ms ease-out; }
+    .nav-entry .ar-center    { animation: slideUp 260ms ease-out; }
+    .nav-entry .minimap-wrap { animation: slideUp 300ms ease-out; }
+
+    /* Arrow bob when direction is straight */
+    .arrow-straight { animation: arrowBob 2s ease-in-out infinite; }
+
+    /* SVG pulse element */
+    .map-pulse { animation: mapPulse 1.8s ease-out infinite; }
   </style>
 </head>
 <body>
@@ -631,6 +820,7 @@
       <p class="start-header__sub">Select your destination exit to begin</p>
     </header>
 
+    <!-- White card — same surface token as the nav bottom panel -->
     <div class="start-card">
 
       <!-- Station selector -->
@@ -686,38 +876,51 @@
     <!-- AR overlay layer -->
     <div class="ar-overlay" id="ar-overlay">
 
-      <!-- Top bar -->
+      <!-- ── Top navigation bar ── -->
       <nav class="nav-top">
-        <button class="nav-btn-back" id="btn-back" aria-label="Go back">
-          <span class="material-symbols-outlined">arrow_back</span>
-        </button>
-        <div class="nav-dest-pill">
-          <span class="material-symbols-outlined">location_pin</span>
-          <span class="nav-dest-text" id="nav-dest-text">Exit B — Central Station</span>
+
+        <!-- Row 1: back button | centered destination pill | balancing spacer -->
+        <div class="nav-top-row1">
+          <button class="nav-btn-back" id="btn-back" aria-label="Go back">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </button>
+
+          <div class="nav-dest-pill">
+            <span class="material-symbols-outlined">location_pin</span>
+            <span class="nav-dest-text" id="nav-dest-text">Exit B — Central Station</span>
+          </div>
+
+          <div class="nav-top-spacer" aria-hidden="true"></div>
         </div>
+
+        <!-- Row 2: AR Live status pill -->
+        <div class="nav-top-row2">
+          <div class="nav-status-pill">
+            <span class="nav-live-dot" aria-hidden="true"></span>
+            AR Live
+          </div>
+        </div>
+
       </nav>
 
-      <!-- Central AR elements -->
+      <!-- ── Central AR elements ── -->
       <div class="ar-center" id="ar-center">
 
-        <!-- Distance badge -->
+        <!-- Distance badge (glass pill on camera) -->
         <div class="distance-badge" id="distance-badge">~20 ft to Exit B</div>
 
-        <!-- Direction arrow wrapper (transition applied here) -->
+        <!-- Direction arrow (fill controlled by --arrow-fill token via CSS) -->
         <div class="arrow-wrap" id="arrow-wrap">
-          <!-- SVG arrow (default: pointing up = straight) -->
-          <svg id="nav-arrow" class="nav-arrow" viewBox="0 0 80 100"
+          <svg id="nav-arrow" class="nav-arrow" viewBox="0 0 100 120"
                xmlns="http://www.w3.org/2000/svg" aria-label="Direction arrow">
-            <path d="M40 95 L40 30" stroke="white" stroke-width="9"
-                  stroke-linecap="round" fill="none"/>
-            <polygon points="40,5 20,35 60,35" fill="white"/>
+            <path d="M50 5 L8 58 L36 58 L36 110 Q36 117 50 117 Q64 117 64 110 L64 58 L92 58 Z"/>
           </svg>
         </div>
 
         <!-- Step counter -->
         <div class="step-indicator" id="step-indicator">Step 1 of 4</div>
 
-        <!-- Reassurance pill -->
+        <!-- Reassurance pill (glass pill on camera) -->
         <div class="reassurance-pill" id="reassurance-pill">
           <span class="material-symbols-outlined">check_circle</span>
           <span id="reassurance-text">You are on the right path</span>
@@ -725,14 +928,27 @@
 
       </div>
 
-      <!-- Mini map (bottom-left) -->
+      <!-- ── Right-side utility buttons (visual placeholders) ── -->
+      <div class="nav-utils" aria-hidden="true">
+        <button class="nav-util-btn" tabindex="-1">
+          <span class="material-symbols-outlined">layers</span>
+        </button>
+        <button class="nav-util-btn" tabindex="-1">
+          <span class="material-symbols-outlined">volume_up</span>
+        </button>
+        <button class="nav-util-btn" tabindex="-1">
+          <span class="material-symbols-outlined">my_location</span>
+        </button>
+      </div>
+
+      <!-- ── Mini map (white card on camera) ── -->
       <div class="minimap-wrap" id="minimap-wrap">
         <svg id="minimap" class="minimap-svg"
              viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg"
              aria-label="Mini map"></svg>
       </div>
 
-      <!-- Bottom control panel -->
+      <!-- ── Bottom instruction card (white — same surface-card token as start card) ── -->
       <div class="bottom-panel" id="bottom-panel">
 
         <!-- Step progress bar -->
@@ -740,10 +956,14 @@
           <div class="progress-fill" id="progress-fill"></div>
         </div>
 
-        <!-- Instruction text -->
+        <!-- Instruction: direction icon + bold text -->
         <div>
-          <p class="instruction-text" id="instruction-text">Head straight through the main hall</p>
-          <p class="instruction-hint" id="instruction-hint">Follow the blue line on the floor</p>
+          <div class="instruction-row">
+            <span class="material-symbols-outlined instruction-icon" id="instruction-icon">arrow_upward</span>
+            <p class="instruction-text" id="instruction-text">Head straight through the main hall</p>
+          </div>
+          <!-- Hint: step counter · contextual hint merged -->
+          <p class="instruction-hint" id="instruction-hint">Step 1 of 4 · Follow the blue line on the floor</p>
         </div>
 
         <!-- Next Step button -->
@@ -761,6 +981,32 @@
 
   <script>
     'use strict';
+
+    /* ─────────────────────────────────────────────
+       Map color constants — centralised here so
+       they mirror the CSS semantic tokens for the
+       light minimap card (white card on camera).
+    ───────────────────────────────────────────── */
+    const MAP_COLORS = {
+      corridor:      'rgba(0,0,0,0.15)',    /* --map-corridor  */
+      routeLine:     '#2f49d1',             /* --color-primary */
+      exitActive:    '#ff5252',             /* --red-400       */
+      exitDim:       'rgba(0,0,0,0.20)',
+      labelActive:   '#ff5252',
+      labelDim:      'rgba(0,0,0,0.40)',
+      dot:           '#2f49d1',             /* --color-primary */
+      dotStroke:     '#ffffff',
+      pulseRing:     'rgba(74,222,128,0.38)',  /* green pulse — live location ring */
+      startMarker:   'rgba(0,0,0,0.15)',
+      startStroke:   'rgba(0,0,0,0.30)',
+    };
+
+    /* Arrow SVG template — fill is handled by CSS .nav-arrow path rule */
+    const ARROW_SVG = `
+      <svg id="nav-arrow" class="nav-arrow" viewBox="0 0 100 120"
+           xmlns="http://www.w3.org/2000/svg" aria-label="Direction arrow">
+        <path d="M50 5 L8 58 L36 58 L36 110 Q36 117 50 117 Q64 117 64 110 L64 58 L92 58 Z"/>
+      </svg>`;
 
     /* ─────────────────────────────────────────────
        Data
@@ -825,29 +1071,29 @@
       ],
     };
 
-    // Direction → rotation degrees (applied to arrow SVG via CSS transform)
-    const directionDeg = { straight: 0, left: -90, right: 90, arrived: 0 };
+    const directionDeg  = { straight: 0, left: -90, right: 90, arrived: 0 };
+    const directionIcon = {
+      straight: 'arrow_upward',
+      left:     'turn_left',
+      right:    'turn_right',
+      arrived:  'check_circle',
+    };
 
-    // Reassurance messages
     const reassuranceMessages = [
-  () => 'You are on the right path',
-  () => {
-    if (!state.exit) return '';
-    return `~${Math.max(1, routes[state.exit].length - state.stepIndex - 1)} min to Exit ${state.exit}`;
-  },
-  () => 'Accessible route available',
-  () => 'Stay on the highlighted path',
-];
+      () => 'You are on the right path',
+      () => `~${Math.max(1, routes[state.exit].length - state.stepIndex - 1)} min to Exit ${state.exit}`,
+      () => 'Accessible route available',
+      () => 'Stay on the highlighted path',
+    ];
 
     /* ─────────────────────────────────────────────
-       Mini Map Data
+       Mini Map Data — SVG viewBox: 0 0 200 160
     ───────────────────────────────────────────── */
-    // SVG viewBox: 0 0 200 160
     const corridors = [
-      [20, 80, 180, 80],   // Main horizontal corridor
-      [100, 20, 100, 140], // Central vertical corridor
-      [20, 40, 100, 40],   // NW wing
-      [100, 120, 180, 120],// SE wing
+      [20, 80, 180, 80],
+      [100, 20, 100, 140],
+      [20, 40, 100, 40],
+      [100, 120, 180, 120],
     ];
 
     const exitPoints = {
@@ -864,7 +1110,6 @@
       D: { x: 96,  y: 155 },
     };
 
-    // Discrete dot positions (one per step, per exit), from centre outward
     const dotPositions = {
       A: [ {x:100,y:80}, {x:65,y:80}, {x:40,y:60}, {x:20,y:40} ],
       B: [ {x:100,y:80}, {x:130,y:80}, {x:158,y:80}, {x:180,y:80} ],
@@ -890,29 +1135,29 @@
        Element refs
     ───────────────────────────────────────────── */
     const el = {
-      screenStart:      document.getElementById('screen-start'),
-      screenNav:        document.getElementById('screen-nav'),
-      stationSelect:    document.getElementById('station-select'),
-      exitGrid:         document.getElementById('exit-grid'),
-      exitDesc:         document.getElementById('exit-desc'),
-      btnStart:         document.getElementById('btn-start'),
-      btnBack:          document.getElementById('btn-back'),
-      btnNext:          document.getElementById('btn-next'),
-      btnNextLabel:     document.getElementById('btn-next-label'),
-      navDestText:      document.getElementById('nav-dest-text'),
-      arCenter:         document.getElementById('ar-center'),
-      distanceBadge:    document.getElementById('distance-badge'),
-      arrowWrap:        document.getElementById('arrow-wrap'),
-      navArrow:         document.getElementById('nav-arrow'),
-      stepIndicator:    document.getElementById('step-indicator'),
-      reassurancePill:  document.getElementById('reassurance-pill'),
-      reassuranceText:  document.getElementById('reassurance-text'),
-      minimap:          document.getElementById('minimap'),
-      progressFill:     document.getElementById('progress-fill'),
-      instructionText:  document.getElementById('instruction-text'),
-      instructionHint:  document.getElementById('instruction-hint'),
-      camVideo:         document.getElementById('cam-video'),
-      camError:         document.getElementById('cam-error'),
+      screenStart:     document.getElementById('screen-start'),
+      screenNav:       document.getElementById('screen-nav'),
+      stationSelect:   document.getElementById('station-select'),
+      exitGrid:        document.getElementById('exit-grid'),
+      exitDesc:        document.getElementById('exit-desc'),
+      btnStart:        document.getElementById('btn-start'),
+      btnBack:         document.getElementById('btn-back'),
+      btnNext:         document.getElementById('btn-next'),
+      btnNextLabel:    document.getElementById('btn-next-label'),
+      navDestText:     document.getElementById('nav-dest-text'),
+      arCenter:        document.getElementById('ar-center'),
+      distanceBadge:   document.getElementById('distance-badge'),
+      arrowWrap:       document.getElementById('arrow-wrap'),
+      stepIndicator:   document.getElementById('step-indicator'),
+      reassurancePill: document.getElementById('reassurance-pill'),
+      reassuranceText: document.getElementById('reassurance-text'),
+      minimap:         document.getElementById('minimap'),
+      progressFill:    document.getElementById('progress-fill'),
+      instructionText: document.getElementById('instruction-text'),
+      instructionHint: document.getElementById('instruction-hint'),
+      instructionIcon: document.getElementById('instruction-icon'),
+      camVideo:        document.getElementById('cam-video'),
+      camError:        document.getElementById('cam-error'),
     };
 
     /* ─────────────────────────────────────────────
@@ -927,9 +1172,6 @@
       el.btnStart.disabled = false;
     }
 
-    /* ─────────────────────────────────────────────
-       Navigation Logic
-    ───────────────────────────────────────────── */
     /* ─────────────────────────────────────────────
        Camera
     ───────────────────────────────────────────── */
@@ -947,22 +1189,18 @@
         el.camError.classList.add('hidden');
       }
 
-      // 1st attempt: force exact back camera
       navigator.mediaDevices.getUserMedia({
         video: { facingMode: { exact: 'environment' } },
         audio: false,
       })
       .then(applyStream)
       .catch(() => {
-        // 2nd attempt: prefer back camera but allow fallback (works on desktop)
         navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment' },
           audio: false,
         })
         .then(applyStream)
-        .catch(() => {
-          el.camError.classList.remove('hidden');
-        });
+        .catch(() => { el.camError.classList.remove('hidden'); });
       });
     }
 
@@ -976,6 +1214,9 @@
       el.camError.classList.add('hidden');
     }
 
+    /* ─────────────────────────────────────────────
+       Navigation Logic
+    ───────────────────────────────────────────── */
     function startNavigation() {
       state.stepIndex = 0;
       state.reassuranceIndex = 0;
@@ -999,31 +1240,25 @@
         state.stepIndex++;
         updateUI();
         updateMiniMap();
-        if (state.stepIndex === steps.length - 1) {
-          handleArrived();
-        }
+        if (state.stepIndex === steps.length - 1) handleArrived();
       }
     }
 
     function handleArrived() {
       clearInterval(state.reassuranceTimer);
 
-      // Show arrived state in arrow area
       el.arrowWrap.innerHTML = `<span class="material-symbols-outlined arrived-icon">check_circle</span>`;
       el.arrowWrap.classList.remove('arrow-straight', 'fading');
       el.arrowWrap.style.transform = '';
 
-      // Update button
       el.btnNext.disabled = true;
       el.btnNextLabel.textContent = 'Arrived!';
       el.btnNext.querySelector('.material-symbols-outlined').textContent = 'done';
 
-      // Update reassurance
       el.reassuranceText.textContent = `You've arrived at Exit ${state.exit}!`;
       el.reassurancePill.querySelector('.material-symbols-outlined').textContent = 'celebration';
       el.reassurancePill.querySelector('.material-symbols-outlined').style.color = '#facc15';
 
-      // Update progress
       el.progressFill.style.width = '100%';
       el.progressFill.style.background = 'var(--color-arrived)';
     }
@@ -1036,18 +1271,14 @@
       el.screenNav.classList.add('hidden');
       el.screenStart.classList.remove('hidden');
 
-      // Reset nav arrow for next use
-      el.arrowWrap.innerHTML = `
-        <svg id="nav-arrow" class="nav-arrow" viewBox="0 0 80 100"
-             xmlns="http://www.w3.org/2000/svg" aria-label="Direction arrow">
-          <path d="M40 95 L40 30" stroke="white" stroke-width="9"
-                stroke-linecap="round" fill="none"/>
-          <polygon points="40,5 20,35 60,35" fill="white"/>
-        </svg>`;
+      el.arrowWrap.innerHTML = ARROW_SVG;
+      el.arrowWrap.style.transform = '';
+
       el.btnNext.disabled = false;
       el.btnNextLabel.textContent = 'Next Step';
       el.btnNext.querySelector('.material-symbols-outlined').textContent = 'arrow_forward';
       el.progressFill.style.background = 'var(--color-primary)';
+      el.instructionIcon.textContent = 'arrow_upward';
     }
 
     /* ─────────────────────────────────────────────
@@ -1055,17 +1286,16 @@
     ───────────────────────────────────────────── */
     function updateUI() {
       const steps = routes[state.exit];
-      const step = steps[state.stepIndex];
+      const step  = steps[state.stepIndex];
       const total = steps.length;
-      const pct = ((state.stepIndex + 1) / total * 100).toFixed(1);
+      const pct   = ((state.stepIndex + 1) / total * 100).toFixed(1);
 
-      // Text fields
       el.instructionText.textContent = step.instruction;
-      el.instructionHint.textContent = step.hint;
+      el.instructionHint.textContent = `Step ${state.stepIndex + 1} of ${total} · ${step.hint}`;
       el.stepIndicator.textContent   = `Step ${state.stepIndex + 1} of ${total}`;
       el.navDestText.textContent     = `Exit ${state.exit} — ${stations[state.station]}`;
+      el.instructionIcon.textContent = directionIcon[step.direction] || 'arrow_upward';
 
-      // Distance badge (hide on arrived)
       if (step.direction === 'arrived') {
         el.distanceBadge.style.opacity = '0';
       } else {
@@ -1073,10 +1303,8 @@
         el.distanceBadge.textContent   = `~${step.distance} to Exit ${state.exit}`;
       }
 
-      // Progress bar
       el.progressFill.style.width = pct + '%';
 
-      // Arrow direction — fade out, rotate, fade in
       if (step.direction !== 'arrived') {
         const targetDeg = directionDeg[step.direction];
         el.arrowWrap.classList.add('fading');
@@ -1095,42 +1323,35 @@
     const SVG_NS = 'http://www.w3.org/2000/svg';
 
     function svgEl(tag, attrs) {
-      const el = document.createElementNS(SVG_NS, tag);
-      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
-      return el;
+      const node = document.createElementNS(SVG_NS, tag);
+      for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+      return node;
     }
 
     function updateMiniMap() {
       const svg = el.minimap;
       while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-      // 1. Corridor lines
       corridors.forEach(([x1, y1, x2, y2]) => {
         svg.appendChild(svgEl('line', {
           x1, y1, x2, y2,
-          stroke: 'rgba(255,255,255,0.2)',
+          stroke: MAP_COLORS.corridor,
           'stroke-width': '5',
           'stroke-linecap': 'round',
         }));
       });
 
-      // 2. All exit markers (dimmed) + labels
       for (const [key, pt] of Object.entries(exitPoints)) {
         const isSelected = key === state.exit;
-        const color = isSelected ? '#ff5252' : 'rgba(255,255,255,0.25)';
-
-        // Diamond marker
         const size = isSelected ? 7 : 5;
         svg.appendChild(svgEl('polygon', {
           points: `${pt.x},${pt.y - size} ${pt.x + size},${pt.y} ${pt.x},${pt.y + size} ${pt.x - size},${pt.y}`,
-          fill: color,
+          fill: isSelected ? MAP_COLORS.exitActive : MAP_COLORS.exitDim,
         }));
-
-        // Label
         const lbl = exitLabels[key];
         const txt = svgEl('text', {
           x: lbl.x, y: lbl.y,
-          fill: isSelected ? '#ff8a80' : 'rgba(255,255,255,0.35)',
+          fill: isSelected ? MAP_COLORS.labelActive : MAP_COLORS.labelDim,
           'font-size': isSelected ? '9' : '8',
           'font-family': 'system-ui, sans-serif',
           'font-weight': isSelected ? '700' : '400',
@@ -1140,16 +1361,12 @@
         svg.appendChild(txt);
       }
 
-      // 3. Route highlight — dashed cyan polyline from start → current dot → exit
       const positions = dotPositions[state.exit];
       const exitPt    = exitPoints[state.exit];
-      // Build points: all dot positions up to and including current, then exit
-      const pathPts = positions.slice(0, state.stepIndex + 1).concat([exitPt]);
-      const pointsStr = pathPts.map(p => `${p.x},${p.y}`).join(' ');
-
+      const pathPts   = positions.slice(0, state.stepIndex + 1).concat([exitPt]);
       svg.appendChild(svgEl('polyline', {
-        points: pointsStr,
-        stroke: '#00e5ff',
+        points: pathPts.map(p => `${p.x},${p.y}`).join(' '),
+        stroke: MAP_COLORS.routeLine,
         'stroke-width': '2.5',
         'stroke-dasharray': '6 4',
         'stroke-linecap': 'round',
@@ -1157,29 +1374,24 @@
         opacity: '0.85',
       }));
 
-      // 4. Current position — pulse ring + solid dot
       const dot = positions[state.stepIndex];
-
-      const pulse = svgEl('circle', {
+      svg.appendChild(svgEl('circle', {
         cx: dot.x, cy: dot.y, r: '6',
-        fill: 'rgba(47,73,209,0.45)',
+        fill: MAP_COLORS.pulseRing,
         class: 'map-pulse',
-      });
-      svg.appendChild(pulse);
-
+      }));
       svg.appendChild(svgEl('circle', {
         cx: dot.x, cy: dot.y, r: '5',
-        fill: '#2f49d1',
-        stroke: 'white',
+        fill: MAP_COLORS.dot,
+        stroke: MAP_COLORS.dotStroke,
         'stroke-width': '1.5',
       }));
 
-      // Start marker (center = 100,80)
       if (state.stepIndex === 0) {
         svg.appendChild(svgEl('circle', {
           cx: '100', cy: '80', r: '4',
-          fill: 'rgba(255,255,255,0.5)',
-          stroke: 'white',
+          fill: MAP_COLORS.startMarker,
+          stroke: MAP_COLORS.startStroke,
           'stroke-width': '1',
         }));
       }
@@ -1206,9 +1418,7 @@
     /* ─────────────────────────────────────────────
        Event Listeners
     ───────────────────────────────────────────── */
-    el.stationSelect.addEventListener('change', e => {
-      state.station = e.target.value;
-    });
+    el.stationSelect.addEventListener('change', e => { state.station = e.target.value; });
 
     el.exitGrid.addEventListener('click', e => {
       const btn = e.target.closest('.exit-pill');
@@ -1216,7 +1426,6 @@
     });
 
     el.btnStart.addEventListener('click', startNavigation);
-
     el.btnBack.addEventListener('click', goBack);
 
     el.btnNext.addEventListener('click', () => {
