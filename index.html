@@ -221,6 +221,44 @@
       gap: var(--space-8);
     }
 
+    /* ── Lang toggle (top-right of start screen) ── */
+    .lang-toggle {
+      position: absolute;
+      top: max(var(--space-4), env(safe-area-inset-top, 16px));
+      right: var(--space-4);
+      display: flex;
+      align-items: center;
+      background: var(--overlay-dark);
+      border: 1px solid var(--border-on-dark);
+      border-radius: var(--radius-pill);
+      backdrop-filter: var(--blur-sm);
+      -webkit-backdrop-filter: var(--blur-sm);
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .lang-segment {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-on-dark-muted);
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition:
+        background var(--motion-duration-normal) var(--motion-easing-standard),
+        color var(--motion-duration-normal) var(--motion-easing-standard);
+      letter-spacing: 0.04em;
+    }
+
+    .lang-segment.active {
+      background: var(--color-primary-on-dark);
+      color: var(--ink-900);
+      border-radius: var(--radius-pill);
+    }
+
+    .lang-segment:not(.active):active { opacity: 0.7; }
+
     /* ── Start: Header (on dark backdrop) ── */
     .start-header {
       text-align: center;
@@ -826,6 +864,12 @@
   <!-- ══ SCREEN 1: START ══════════════════════════════════════ -->
   <div id="screen-start">
 
+    <!-- Language toggle -->
+    <div class="lang-toggle" id="lang-toggle" role="group" aria-label="Language">
+      <button class="lang-segment active" data-lang="en">EN</button>
+      <button class="lang-segment" data-lang="zh">中</button>
+    </div>
+
     <header class="start-header">
       <span class="material-symbols-outlined start-header__icon">subway</span>
       <h1 class="start-header__title">AR Station Navigator</h1>
@@ -1099,6 +1143,183 @@
     ];
 
     /* ─────────────────────────────────────────────
+       Translations
+    ───────────────────────────────────────────── */
+    const translations = {
+      en: {
+        appTitle:       'AR Station Navigator',
+        appSub:         'Select your destination exit to begin',
+        stationLabel:   'Station',
+        selectExit:     'Select Exit',
+        exits:          { A: 'Exit A', B: 'Exit B', C: 'Exit C', D: 'Exit D' },
+        startBtn:       'Start Navigation',
+        stations: {
+          central: 'Central Station',
+          midtown: 'Midtown Plaza',
+          harbor:  'Harbor Terminal',
+        },
+        exitMeta: {
+          A: 'Street Level · Elevator Available · Bus Stop Nearby',
+          B: 'Underground · Nearest to Platform 1 · Accessible Gate',
+          C: 'Street Level · Bus Stop Outside · Shops Inside',
+          D: 'Accessible Route · Elevator + Ramp · Drop-off Zone',
+        },
+        routes: {
+          A: [
+            { instruction: 'Head straight through the main hall',       direction: 'straight', distance: '45 ft', hint: 'Follow the blue line on the floor' },
+            { instruction: 'Turn left at the escalator',                direction: 'left',     distance: '28 ft', hint: 'Escalator is on your right' },
+            { instruction: 'Continue forward past the ticket gate',     direction: 'straight', distance: '14 ft', hint: 'Keep your ticket ready' },
+            { instruction: "You've arrived at Exit A",                  direction: 'arrived',  distance: '0 ft',  hint: 'Exit to street level' },
+          ],
+          B: [
+            { instruction: 'Walk toward the south corridor',            direction: 'straight', distance: '35 ft', hint: 'Overhead signs point to Exit B' },
+            { instruction: 'Turn right at the stairwell',               direction: 'right',    distance: '22 ft', hint: 'Stay level — do not take the stairs' },
+            { instruction: 'Pass through the fare gate',                direction: 'straight', distance: '18 ft', hint: 'Tap your card on the reader' },
+            { instruction: "You've arrived at Exit B",                  direction: 'arrived',  distance: '0 ft',  hint: 'Platform 1 is directly above' },
+          ],
+          C: [
+            { instruction: 'Head to the central concourse',             direction: 'straight', distance: '48 ft', hint: 'Large open area ahead' },
+            { instruction: 'Bear right toward the food court',          direction: 'right',    distance: '38 ft', hint: 'Follow Exit C overhead signs' },
+            { instruction: 'Turn left at the information kiosk',        direction: 'left',     distance: '20 ft', hint: 'Blue kiosk on your right side' },
+            { instruction: 'Walk down the corridor',                    direction: 'straight', distance: '12 ft', hint: 'Natural light visible ahead' },
+            { instruction: "You've arrived at Exit C",                  direction: 'arrived',  distance: '0 ft',  hint: 'Bus stop is immediately outside' },
+          ],
+          D: [
+            { instruction: 'Take the accessible route — follow the yellow strip', direction: 'straight', distance: '30 ft', hint: 'Ramp on the left side ahead' },
+            { instruction: 'Turn right at the elevator lobby',          direction: 'right',    distance: '24 ft', hint: 'Elevator bank on your right' },
+            { instruction: 'Proceed through the wide accessible gate',  direction: 'straight', distance: '20 ft', hint: 'Wide gate — wheelchair friendly' },
+            { instruction: 'Continue to the ramp',                      direction: 'straight', distance: '10 ft', hint: 'Gentle slope ahead' },
+            { instruction: "You've arrived at Exit D",                  direction: 'arrived',  distance: '0 ft',  hint: 'Accessible drop-off zone outside' },
+          ],
+        },
+        reassurance: [
+          () => 'You are on the right path',
+          () => `~${Math.max(1, routes[state.exit].length - state.stepIndex - 1)} min to Exit ${state.exit}`,
+          () => 'Accessible route available',
+          () => 'Stay on the highlighted path',
+        ],
+        arLive:    'AR Live',
+        camDenied: 'Camera access denied',
+        stepOf:    (cur, total) => `Step ${cur} of ${total}`,
+        distTo:    (dist, exit) => `~${dist} to Exit ${exit}`,
+        nextStep:  'Next Step',
+        finish:    'Finish',
+      },
+      zh: {
+        appTitle:       'AR 车站导航',
+        appSub:         '请选择目的地出口开始导航',
+        stationLabel:   '车站',
+        selectExit:     '选择出口',
+        exits:          { A: 'A 出口', B: 'B 出口', C: 'C 出口', D: 'D 出口' },
+        startBtn:       '开始导航',
+        stations: {
+          central: '中央车站',
+          midtown: '中城广场',
+          harbor:  '港口总站',
+        },
+        exitMeta: {
+          A: '地面层 · 设有电梯 · 附近有公交站',
+          B: '地下层 · 最近一号站台 · 无障碍闸机',
+          C: '地面层 · 出口外有公交站 · 内有商店',
+          D: '无障碍通道 · 电梯 + 坡道 · 落客区',
+        },
+        routes: {
+          A: [
+            { instruction: '径直穿过大厅',         direction: 'straight', distance: '约14米', hint: '沿地面蓝线前行' },
+            { instruction: '在扶梯处向左转',        direction: 'left',     distance: '约8.5米', hint: '扶梯在您右侧' },
+            { instruction: '继续向前，通过检票口',  direction: 'straight', distance: '约4.3米', hint: '请备好票卡' },
+            { instruction: '您已到达 A 出口',       direction: 'arrived',  distance: '0',      hint: '从此处前往地面层' },
+          ],
+          B: [
+            { instruction: '向南侧通道走去',        direction: 'straight', distance: '约10.7米', hint: '头顶标牌指向 B 出口' },
+            { instruction: '在楼梯处向右转',        direction: 'right',    distance: '约6.7米',  hint: '请保持水平，勿走楼梯' },
+            { instruction: '通过检票闸机',          direction: 'straight', distance: '约5.5米',  hint: '请在读卡器上刷卡' },
+            { instruction: '您已到达 B 出口',       direction: 'arrived',  distance: '0',       hint: '一号站台就在正上方' },
+          ],
+          C: [
+            { instruction: '前往中央大厅',          direction: 'straight', distance: '约14.6米', hint: '前方有宽阔的开放区域' },
+            { instruction: '向右斜行，朝美食广场走', direction: 'right',    distance: '约11.6米', hint: '跟随 C 出口头顶指示牌' },
+            { instruction: '在问询亭处向左转',       direction: 'left',     distance: '约6.1米',  hint: '蓝色问询亭在您右侧' },
+            { instruction: '沿走廊继续前行',         direction: 'straight', distance: '约3.7米',  hint: '前方可见自然光' },
+            { instruction: '您已到达 C 出口',        direction: 'arrived',  distance: '0',       hint: '公交站就在出口外' },
+          ],
+          D: [
+            { instruction: '走无障碍通道，沿黄色导向带前行', direction: 'straight', distance: '约9.1米', hint: '前方左侧设有坡道' },
+            { instruction: '在电梯大厅处向右转',     direction: 'right',    distance: '约7.3米', hint: '右侧有电梯组' },
+            { instruction: '通过宽幅无障碍闸机',     direction: 'straight', distance: '约6.1米', hint: '宽闸机，轮椅可通行' },
+            { instruction: '继续前往坡道',           direction: 'straight', distance: '约3米',   hint: '前方坡度平缓' },
+            { instruction: '您已到达 D 出口',        direction: 'arrived',  distance: '0',      hint: '无障碍落客区在出口外' },
+          ],
+        },
+        reassurance: [
+          () => '您走在正确的路线上',
+          () => `距 ${state.exit} 出口约 ${Math.max(1, routes[state.exit].length - state.stepIndex - 1)} 分钟`,
+          () => '无障碍通道可用',
+          () => '请保持在标记路线上',
+        ],
+        arLive:    'AR 实时',
+        camDenied: '摄像头访问被拒绝',
+        stepOf:    (cur, total) => `第 ${cur} 步，共 ${total} 步`,
+        distTo:    (dist, exit) => `距 ${exit} 出口约 ${dist}`,
+        nextStep:  '下一步',
+        finish:    '完成',
+      },
+    };
+
+    function applyLang(lang) {
+      const t = translations[lang];
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+
+      // Header
+      document.querySelector('.start-header__title').textContent = t.appTitle;
+      document.querySelector('.start-header__sub').textContent   = t.appSub;
+
+      // Field labels
+      const labels = document.querySelectorAll('.field-label');
+      labels[0].textContent = t.stationLabel;
+      labels[1].textContent = t.selectExit;
+
+      // Station select options
+      const opts = document.querySelectorAll('#station-select option');
+      opts.forEach(o => { o.textContent = t.stations[o.value]; });
+
+      // Exit pills
+      document.querySelectorAll('.exit-pill').forEach(btn => {
+        btn.textContent = t.exits[btn.dataset.exit];
+      });
+
+      // Exit description (re-render with current selection)
+      if (state.exit) {
+        el.exitDesc.textContent = t.exitMeta[state.exit];
+      }
+
+      // Start button
+      document.querySelector('#btn-start').lastChild.textContent = ' ' + t.startBtn;
+
+      // Toggle button active state
+      document.querySelectorAll('.lang-segment').forEach(seg => {
+        seg.classList.toggle('active', seg.dataset.lang === lang);
+      });
+
+      // Nav screen static strings
+      const statusPill = document.querySelector('.nav-status-pill');
+      if (statusPill) {
+        statusPill.lastChild.textContent = ' ' + t.arLive;
+      }
+      const camErr = document.getElementById('cam-error');
+      if (camErr) {
+        camErr.lastChild.textContent = ' ' + t.camDenied;
+      }
+
+      // Sync live data objects so nav screen uses correct language
+      Object.assign(stations, t.stations);
+      Object.assign(exitMeta, t.exitMeta);
+      Object.keys(t.routes).forEach(k => { routes[k] = t.routes[k]; });
+      reassuranceMessages.length = 0;
+      t.reassurance.forEach(fn => reassuranceMessages.push(fn));
+    }
+
+    /* ─────────────────────────────────────────────
        Mini Map Data — SVG viewBox: 0 0 200 160
     ───────────────────────────────────────────── */
     const corridors = [
@@ -1141,6 +1362,7 @@
       reassuranceIndex: 0,
       currentDeg: 0,
       cameraStream: null,
+      lang: 'en',
     };
 
     /* ─────────────────────────────────────────────
@@ -1264,10 +1486,13 @@
       el.arrowWrap.style.transform = '';
 
       el.btnNext.disabled = true;
-      el.btnNextLabel.textContent = 'Arrived!';
+      el.btnNextLabel.textContent = translations[state.lang].finish;
       el.btnNext.querySelector('.material-symbols-outlined').textContent = 'done';
 
-      el.reassuranceText.textContent = `You've arrived at Exit ${state.exit}!`;
+      const tArr = translations[state.lang];
+      el.reassuranceText.textContent = state.lang === 'zh'
+        ? `您已到达 ${state.exit} 出口！`
+        : `You've arrived at Exit ${state.exit}!`;
       el.reassurancePill.querySelector('.material-symbols-outlined').textContent = 'celebration';
       el.reassurancePill.querySelector('.material-symbols-outlined').style.color = '#facc15';
 
@@ -1287,7 +1512,7 @@
       el.arrowWrap.style.transform = '';
 
       el.btnNext.disabled = false;
-      el.btnNextLabel.textContent = 'Next Step';
+      el.btnNextLabel.textContent = translations[state.lang].nextStep;
       el.btnNext.querySelector('.material-symbols-outlined').textContent = 'arrow_forward';
       el.progressFill.style.background = 'var(--color-primary)';
       el.instructionIcon.textContent = 'arrow_upward';
@@ -1302,17 +1527,18 @@
       const total = steps.length;
       const pct   = ((state.stepIndex + 1) / total * 100).toFixed(1);
 
+      const t = translations[state.lang];
       el.instructionText.textContent = step.instruction;
-      el.instructionHint.textContent = `Step ${state.stepIndex + 1} of ${total} · ${step.hint}`;
-      el.stepIndicator.textContent   = `Step ${state.stepIndex + 1} of ${total}`;
-      el.navDestText.textContent     = `Exit ${state.exit} — ${stations[state.station]}`;
+      el.instructionHint.textContent = `${t.stepOf(state.stepIndex + 1, total)} · ${step.hint}`;
+      el.stepIndicator.textContent   = t.stepOf(state.stepIndex + 1, total);
+      el.navDestText.textContent     = `${translations[state.lang].exits[state.exit]} — ${stations[state.station]}`;
       el.instructionIcon.textContent = directionIcon[step.direction] || 'arrow_upward';
 
       if (step.direction === 'arrived') {
         el.distanceBadge.style.opacity = '0';
       } else {
         el.distanceBadge.style.opacity = '1';
-        el.distanceBadge.textContent   = `~${step.distance} to Exit ${state.exit}`;
+        el.distanceBadge.textContent   = t.distTo(step.distance, state.exit);
       }
 
       el.progressFill.style.width = pct + '%';
@@ -1430,6 +1656,13 @@
     /* ─────────────────────────────────────────────
        Event Listeners
     ───────────────────────────────────────────── */
+    document.getElementById('lang-toggle').addEventListener('click', e => {
+      const seg = e.target.closest('.lang-segment');
+      if (!seg || seg.dataset.lang === state.lang) return;
+      state.lang = seg.dataset.lang;
+      applyLang(state.lang);
+    });
+
     el.stationSelect.addEventListener('change', e => { state.station = e.target.value; });
 
     el.exitGrid.addEventListener('click', e => {
